@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+
+<style>
+* {box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif;}
+
+body{
+background-color: #e9c1e6;
+display: flex;
+justify-content: center;
+align-items: center;
+height: 100vh;
+overflow: hidden;
+}
+
+.tv-container{
+display: flex;
+width: 95vw;
+height: 90vh;
+gap: 18px;
+}
+
+.left-panel{
+display: flex;
+flex-direction: column;
+width: 35%;
+gap: 18px;
+}
+
+.rigth-panel{
+display: flex;
+flex-direction: column;
+width: 35%;
+gap: 18px;
+}
+
+.box{
+background-color: rgb(214, 133, 206);
+border: 6px solid rgb(227, 92, 194);
+border-radius: 15px;
+padding: 20px;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+text-align: center;
+box-shadow: 0 4px 15px black;
+}
+
+.box-title{
+color: aliceblue;
+font-size: 2.2vw;
+font-weight: bold;
+text-transform: uppercase;
+text-shadow: 1px 1px 2px black;
+margin-bottom: 12px;
+}
+
+/* painel esquerdo - local (guicho ou consultorio) */
+.local-box {flex: 1; }
+.local-number {
+color: rgb(244, 115, 164);
+font-size: 9vw;
+font-weight: bold;
+line-height: 1;
+}
+
+.local-type {
+color: #f37bcd;
+font-size: 1.8vw;
+font-weight: bold;
+margin-top: 6px;
+}
+
+.history-box{
+flex: 1;
+justify-content: center;
+align-items: center;
+}
+
+.history-box .box-title {font-size: 1.8vw; align-self: center; }
+#history-list{
+list-style: none;
+width: 100%;
+color: rgb(239, 151, 201);
+font-size: 1.5vw;
+font-weight: bold;
+text-align: left;
+}
+
+#history-list li{
+    margin-bottom: 8px;
+    border-bottom: 1px solid grey;
+    padding-bottom: 5px;
+}         
+
+
+/* painel direito - nome do paciente */
+ .patient-box {flex: 3; }
+ .name-patient {
+color: rgb(255, 137, 222);
+font-size: 6.5vw ;
+font-weight: bold;
+line-height: 1.2;
+word-break: break-word;
+ }
+
+ /* logo */
+ .logo-box {flex: 1;}
+ .logo-text {
+
+    color: rgb(231, 156, 206);
+    font-size: 3.5vw;
+    font-weight: bold;
+    text-transform: uppercase;
+ }
+
+/* animação de flash quando chama */
+@keyframes flash {
+    0%, 100% {opacity: 1;}
+50% {opacity: 0.3;}
+}
+.flash {animation: flash 0.5s ease 3;}
+</style>
+<title>Midia Indoor - TV</title>
+</head>
+
+<body>
+
+    <!-- estrutura da tela da tv criada para exibir o local e o nome do 
+     paciente chamado -->
+
+     <div class="tv-container">
+        <div class="left-panel">
+            <div class="box local-box">
+                <div class="box-title" id="local-tipo">guiché</div>
+                <div class="local-number" id="local-numero">---</div>
+    </div>
+
+<div class="box history-box">
+    <div class="box-title">ULTIMA CHAMADA</div>
+   <ul id="history-list"></ul>
+</div>
+
+</div>
+<div class="rigth-panel">
+    <div class="box patient-box">
+        <div class="box-title">PACIENTE</div>
+        <div class="patient-name" id="patient-name">AGUARDANDO...</div>
+      </div>
+      <div class="box logo-box">
+<div class="logo-text">🏥 Sistema hospitalar</div>
+      </div>
+        </div>
+          </div>
+<script>
+let ultimold = null;
+// função e o historico da T
+
+function atualizar() {
+    fetch("/tv/chamado")
+    .then(r => r.json())
+    .then(data => {
+const chamada = data.chamada;
+const historico = data.historico || [];
+
+    if (chamada) {
+document.getElementById("local-tipo").innerText = chamada.localtipo || "GUICHE";
+document.getElementById("local-numero").innerText = chamada.localtipo || "...";
+document.getElementById("patient-name").innerText = chamada.localtipo || "AGUARDANDO...";
+
+//flash visual quando ha chamada nova
+
+if(chamada.id !==ultimold){
+    ultimold = chamada.id;
+    const patientBox = document.querySelector(".patient-box");
+    patientBox.classList.remove("flash");
+    void patientBox.offseWidth;
+    patientBox.classList.add("flash");
+}
+    }
+
+//historico 
+const list = document.getElementById(history-list);
+list.innerHTML = "";
+historico.slice(0, 4).forEach( h => {
+    const li = document.createElement("li");
+    const tipo = h.localTipo ? h.localTipo.substring(0,4) : "GUIC";
+    li.innerText = `$(tipo).$(h.localNumero) - $(h.patient)`;
+    list.appendChild(li);
+});
+})
+
+.catch(err => console.log ("Erro ao buscar chamada", err));
+}
+
+atualizar();
+setInterval(atualizar, 2000);
+
+
+
+
+</script>
+</body>
+</html>

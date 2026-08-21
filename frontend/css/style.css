@@ -1,0 +1,120 @@
+body{ 
+    margin: 0; 
+    padding: 0; 
+    font-family: 'Trebuchet MS', Arial, sans-serif; 
+    background: linear-gradient(135deg, #ffd6e7, #ffeaf3, #ffc1d9);
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    min-height: 100vh;
+}
+
+/* CAIXA PRINCIPAL */
+.container{ 
+    width: 550px;
+    background: rgba(255, 240, 247, 0.95);
+    padding: 40px;
+    
+    border: 6px solid #ff9fc2;
+    border-radius: 25px;
+    
+    box-sizing: border-box;
+    
+    box-shadow:
+        0 0 15px rgba(255, 105, 180, 0.45),
+        0 0 35px rgba(255, 182, 193, 0.55),
+        0 15px 40px rgba(214, 51, 132, 0.25);
+}
+
+/* TÍTULO */
+h2{ 
+    color: #d63384; 
+    margin: 15px 0 25px;
+    text-align: center;
+    
+    text-shadow:
+        0 0 5px #ffb6d5,
+        0 0 12px #ffb6d5;
+}
+
+/* IMAGEM */
+img{ 
+    display: block; 
+    width: 200px; 
+    margin: 0 auto 25px;
+    
+    border-radius: 25px;
+    
+    box-shadow:
+        0 0 10px #ff8fba,
+        0 0 25px rgba(255, 105, 180, 0.65),
+        0 10px 25px rgba(250, 114, 162, 0.45);
+}
+
+/* CAMPOS */
+input{ 
+    width: 100%; 
+    padding: 14px; 
+    margin: 12px 0;
+    
+    border: 2px solid #e99ab7;
+    border-radius: 12px;
+    
+    background: #fffafd;
+    
+    font-size: 16px; 
+    box-sizing: border-box;
+    
+    outline: none;
+    
+    transition: 0.3s;
+    
+    box-shadow:
+        0 0 8px rgba(255, 182, 193, 0.25);
+}
+
+
+input:focus{
+    border-color: #ff69b4;
+    
+    box-shadow:
+        0 0 8px #ff9fca,
+        0 0 18px rgba(255, 105, 180, 0.35);
+}
+
+/* BOTÃO */
+button{ 
+    width: 100%; 
+    padding: 14px; 
+    margin-top: 18px;
+    
+    background: linear-gradient(135deg, #ff69b4, #ff91c6);
+    
+    color: white; 
+    border: none; 
+    border-radius: 12px;
+    
+    font-size: 17px; 
+    font-weight: bold;
+    
+    cursor: pointer; 
+    
+    transition: 0.3s;
+    
+    box-shadow:
+        0 5px 15px rgba(255, 105, 180, 0.4),
+        0 0 15px rgba(255, 182, 193, 0.5);
+}
+
+/* HOVER DO BOTÃO */
+button:hover{ 
+    background: linear-gradient(135deg, #ff4fa3, #ff75b9);
+    
+    transform: translateY(-3px);
+    
+    box-shadow:
+        0 8px 20px rgba(255, 105, 180, 0.55),
+        0 0 25px rgba(255, 182, 193, 0.7);
+}
