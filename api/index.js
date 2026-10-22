@@ -30,6 +30,8 @@ function readDB() {
             historicoChamadas: []
         };
 
+        fs.mkdirSync(path.dirname(DB_FILE), { recursive: true });
+
         fs.writeFileSync(
             DB_FILE,
             JSON.stringify(dbInicial, null, 2),
@@ -39,9 +41,7 @@ function readDB() {
         return dbInicial;
     }
 
-    const db = JSON.parse(
-        fs.readFileSync(DB_FILE, "utf8")
-    );
+    const db = JSON.parse(fs.readFileSync(DB_FILE, "utf8"));
 
     db.usuarios ||= [];
     db.pacientes ||= [];
@@ -57,6 +57,8 @@ function readDB() {
 }
 
 function writeDB(db) {
+    fs.mkdirSync(path.dirname(DB_FILE), { recursive: true });
+
     fs.writeFileSync(
         DB_FILE,
         JSON.stringify(db, null, 2),
@@ -69,9 +71,7 @@ function writeDB(db) {
 // ================================
 
 app.get("/", (req, res) => {
-    res.sendFile(
-        path.join(FRONTEND_DIR, "index.html")
-    );
+    res.sendFile(path.join(FRONTEND_DIR, "index.html"));
 });
 
 // ================================
@@ -82,23 +82,11 @@ app.post("/usuarios", (req, res) => {
     try {
         const db = readDB();
 
-        const usuario = String(
-            req.body.usuario || ""
-        ).trim();
+        const usuario = String(req.body.usuario || "").trim();
+        const senha = String(req.body.senha || "");
+        const tipo = String(req.body.tipo || "").trim();
 
-        const senha = String(
-            req.body.senha || ""
-        );
-
-        const tipo = String(
-            req.body.tipo || ""
-        ).trim();
-
-        const setoresValidos = [
-            "atendimento",
-            "triagem",
-            "medico"
-        ];
+        const setoresValidos = ["atendimento", "triagem", "medico"];
 
         if (!usuario || !senha || !tipo) {
             return res.status(400).json({
@@ -113,8 +101,7 @@ app.post("/usuarios", (req, res) => {
         }
 
         const existe = db.usuarios.some(
-            u => u.usuario.toLowerCase() ===
-                 usuario.toLowerCase()
+            u => u.usuario.toLowerCase() === usuario.toLowerCase()
         );
 
         if (existe) {
@@ -141,7 +128,6 @@ app.post("/usuarios", (req, res) => {
                 tipo: novoUsuario.tipo
             }
         });
-
     } catch (erro) {
         console.error("Erro ao cadastrar usuário:", erro);
 
@@ -160,11 +146,8 @@ app.get("/usuarios", (req, res) => {
         const db = readDB();
 
         res.json(
-            db.usuarios.map(
-                ({ senha, ...usuario }) => usuario
-            )
+            db.usuarios.map(({ senha, ...usuario }) => usuario)
         );
-
     } catch (erro) {
         console.error("Erro ao listar usuários:", erro);
 
@@ -182,17 +165,11 @@ app.post("/login", (req, res) => {
     try {
         const db = readDB();
 
-        const usuario = String(
-            req.body.usuario || ""
-        ).trim();
-
-        const senha = String(
-            req.body.senha || ""
-        );
+        const usuario = String(req.body.usuario || "").trim();
+        const senha = String(req.body.senha || "");
 
         const user = db.usuarios.find(
-            u => u.usuario === usuario &&
-                 u.senha === senha
+            u => u.usuario === usuario && u.senha === senha
         );
 
         if (!user) {
@@ -206,7 +183,6 @@ app.post("/login", (req, res) => {
             usuario: user.usuario,
             tipo: user.tipo
         });
-
     } catch (erro) {
         console.error("Erro no login:", erro);
 
@@ -224,17 +200,9 @@ app.post("/atendimento", (req, res) => {
     try {
         const db = readDB();
 
-        const nome = String(
-            req.body.nome || ""
-        ).trim();
-
-        const cpf = String(
-            req.body.cpf || ""
-        ).trim();
-
-        const tipo = String(
-            req.body.tipo || ""
-        ).trim();
+        const nome = String(req.body.nome || "").trim();
+        const cpf = String(req.body.cpf || "").trim();
+        const tipo = String(req.body.tipo || "").trim();
 
         if (!nome || !cpf || !tipo) {
             return res.status(400).json({
@@ -258,7 +226,6 @@ app.post("/atendimento", (req, res) => {
             mensagem: "Paciente enviado para triagem!",
             paciente
         });
-
     } catch (erro) {
         console.error("Erro no atendimento:", erro);
 
@@ -276,7 +243,6 @@ app.get("/pacientes", (req, res) => {
     try {
         const db = readDB();
         res.json(db.pacientes);
-
     } catch (erro) {
         console.error("Erro ao listar pacientes:", erro);
 
@@ -294,20 +260,10 @@ app.post("/triagem", (req, res) => {
     try {
         const db = readDB();
 
-        const nome = String(
-            req.body.nome || ""
-        ).trim();
-
-        const sintoma = String(
-            req.body.sintoma || ""
-        ).trim();
-
-        const temperaturaInformada =
-            req.body.temperatura;
-
-        const temperatura = Number(
-            temperaturaInformada
-        );
+        const nome = String(req.body.nome || "").trim();
+        const sintoma = String(req.body.sintoma || "").trim();
+        const temperaturaInformada = req.body.temperatura;
+        const temperatura = Number(temperaturaInformada);
 
         if (
             !nome ||
@@ -344,7 +300,6 @@ app.post("/triagem", (req, res) => {
             sintomasVermelhos.includes(sintoma)
         ) {
             risco = "vermelho";
-
         } else if (
             temperatura >= 38 ||
             sintomasAmarelos.includes(sintoma)
@@ -367,8 +322,7 @@ app.post("/triagem", (req, res) => {
         db.triagens.push(triagem);
 
         const paciente = db.pacientes.find(
-            p => p.nome.toLowerCase() ===
-                 nome.toLowerCase() &&
+            p => p.nome.toLowerCase() === nome.toLowerCase() &&
                  p.status === "triagem"
         );
 
@@ -377,9 +331,7 @@ app.post("/triagem", (req, res) => {
         }
 
         writeDB(db);
-
         res.status(201).json(triagem);
-
     } catch (erro) {
         console.error("Erro na triagem:", erro);
 
@@ -398,11 +350,8 @@ app.get("/triagens", (req, res) => {
         const db = readDB();
 
         res.json(
-            db.triagens.filter(
-                t => t.status !== "atendido"
-            )
+            db.triagens.filter(t => t.status !== "atendido")
         );
-
     } catch (erro) {
         console.error("Erro ao listar triagens:", erro);
 
@@ -439,21 +388,10 @@ app.post("/consulta", (req, res) => {
     try {
         const db = readDB();
 
-        const paciente = String(
-            req.body.paciente || ""
-        ).trim();
-
-        const diagnostico = String(
-            req.body.diagnostico || ""
-        ).trim();
-
-        const medicacao = String(
-            req.body.medicacao || ""
-        ).trim();
-
-        const obs = String(
-            req.body.obs || ""
-        ).trim();
+        const paciente = String(req.body.paciente || "").trim();
+        const diagnostico = String(req.body.diagnostico || "").trim();
+        const medicacao = String(req.body.medicacao || "").trim();
+        const obs = String(req.body.obs || "").trim();
 
         if (!paciente || !diagnostico || !medicacao) {
             return res.status(400).json({
@@ -473,8 +411,7 @@ app.post("/consulta", (req, res) => {
         db.consultas.push(consulta);
 
         const triagem = db.triagens.find(
-            t => t.nome.toLowerCase() ===
-                 paciente.toLowerCase() &&
+            t => t.nome.toLowerCase() === paciente.toLowerCase() &&
                  t.status !== "atendido"
         );
 
@@ -483,8 +420,7 @@ app.post("/consulta", (req, res) => {
         }
 
         const cadastro = db.pacientes.find(
-            p => p.nome.toLowerCase() ===
-                 paciente.toLowerCase()
+            p => p.nome.toLowerCase() === paciente.toLowerCase()
         );
 
         if (cadastro) {
@@ -497,7 +433,6 @@ app.post("/consulta", (req, res) => {
             mensagem: "Consulta salva com sucesso!",
             consulta
         });
-
     } catch (erro) {
         console.error("Erro na consulta:", erro);
 
@@ -515,7 +450,6 @@ app.get("/medicacoes", (req, res) => {
     try {
         const db = readDB();
         res.json(db.consultas);
-
     } catch (erro) {
         console.error("Erro ao buscar medicações:", erro);
 
@@ -533,17 +467,9 @@ app.post("/tv/chamar", (req, res) => {
     try {
         const db = readDB();
 
-        const paciente = String(
-            req.body.paciente || ""
-        ).trim();
-
-        const localTipo = String(
-            req.body.localTipo || "GUICHÊ"
-        ).trim();
-
-        const localNumero = String(
-            req.body.localNumero || "01"
-        ).trim();
+        const paciente = String(req.body.paciente || "").trim();
+        const localTipo = String(req.body.localTipo || "GUICHÊ").trim();
+        const localNumero = String(req.body.localNumero || "01").trim();
 
         if (!paciente) {
             return res.status(400).json({
@@ -561,9 +487,7 @@ app.post("/tv/chamar", (req, res) => {
 
         db.chamadaAtual = chamada;
         db.historicoChamadas.unshift(chamada);
-
-        db.historicoChamadas =
-            db.historicoChamadas.slice(0, 8);
+        db.historicoChamadas = db.historicoChamadas.slice(0, 8);
 
         writeDB(db);
 
@@ -571,7 +495,6 @@ app.post("/tv/chamar", (req, res) => {
             mensagem: "Paciente chamado na TV!",
             chamada
         });
-
     } catch (erro) {
         console.error("Erro ao chamar paciente:", erro);
 
@@ -593,7 +516,6 @@ app.get("/tv/chamado", (req, res) => {
             chamada: db.chamadaAtual,
             historico: db.historicoChamadas
         });
-
     } catch (erro) {
         console.error("Erro ao consultar TV:", erro);
 
@@ -603,5 +525,16 @@ app.get("/tv/chamado", (req, res) => {
     }
 });
 
-// VERCEL
+// ================================
+// INICIAR SERVIDOR NO RENDER
+// ================================
+
+const PORT = process.env.PORT || 3000;
+
+if (require.main === module) {
+    app.listen(PORT, "0.0.0.0", () => {
+        console.log(`Sentinela rodando na porta ${PORT}`);
+    });
+}
+
 module.exports = app;
